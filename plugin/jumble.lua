@@ -1,0 +1,1 @@
+require("jumble.commands").commands()

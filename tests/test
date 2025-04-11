@@ -1,0 +1,3 @@
+#!/bin/bash
+
+busted unit-test.lua -m "../lua/?.lua;../lua/jumble/*.lua"
