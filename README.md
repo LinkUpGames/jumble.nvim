@@ -38,13 +38,28 @@ require("jumble").setup()
 ---@field months number The number of months before the new theme rolls over
 ---@field years number The number of years before the new theme rolls over
 ---@field themes table<string> The themes to include for randomizing (empty will default to all themes)
-return{
+return {
   "LinkUpGames/jumble.nvim",
   opts = {
     days = 1,
     months = 0,
     years = 0,
     themes = {}
+  }
+}
+```
+
+```lua
+-- Example setup
+return {
+  "LinkUpGames/jumble.nvim",
+  opts = {
+    days = 2, -- switches to a random theme every 2 days
+    themes = { -- Will randomly pick from these three themes
+      "tokyonight",
+      "eldritch",
+      "catppuccin"
+    }
   }
 }
 ```

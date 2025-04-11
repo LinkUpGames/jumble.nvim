@@ -4,6 +4,7 @@ local utils = require("jumble.utils")
 ---@field days number The number of days before the new theme rolls over
 ---@field months number The number of months before the new theme rolls over
 ---@field years number The number of years before the new theme rolls over
+---@field hours number The number of hours befoer the new theme rolls over
 ---@field themes table<string> The themes to include for randomizing (empty will default to all colorschemes)
 
 -- Local Options for plugin
@@ -12,6 +13,7 @@ local options = {
 	days = 1,
 	months = 0,
 	years = 0,
+	hours = 0,
 	themes = utils.get_colorschemes(), -- The themes to rotate for (empty means all)
 }
 
