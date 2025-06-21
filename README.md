@@ -53,6 +53,7 @@ return {
 ```
 
 **Example** 
+
 ```lua
 -- Example setup
 return {
