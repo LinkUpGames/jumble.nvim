@@ -173,6 +173,7 @@ function M.randomize(colorscheme)
 		days = M.opts.days,
 		years = M.opts.years,
 		months = M.opts.months,
+		hours = M.opts.hours,
 	}
 
 	local newtheme = M.get_truly_random(themes, colorscheme)
