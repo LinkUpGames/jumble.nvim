@@ -2,7 +2,7 @@
 
 Say goodbye to tedious manual theme changes! With this plugin, your theme will automatically update to a random theme at a specified time interval.
 
-- **Choose Your interval**: Set how often you want your theme to refresh (e.g., every days, every other week)
+- **Choose Your interval**: Set how often you want your theme to refresh (e.g., every day, every other week)
 
 - **Random Themes**: Set your theme randomly after the set time interval. Choose from a list of themes you provide or from all the themes installed
 
