@@ -2,11 +2,13 @@
 ---@field year number The year
 ---@field month number The month
 ---@field day number The day
+---@field hour number The hour
 
 ---@class Opts
 ---@field years number The number of years after the initial date
 ---@field months number The number of months after the initial date
 ---@field days number The number of days
+---@field hours number The number of hours
 
 local M = {
 	opts = {},
@@ -77,18 +79,21 @@ end
 
 ---Parse the date as a string "yyyy-mm-dd", returns a table with the year, month and day
 ---@param date_string string
----@return {year: number, month: number, day:number} values Returns the year, month and day as a value
+---@return {year: number, month: number, day:number, hour:number} values Returns the year, month and day as a value
 function M.parse_date(date_string)
-	local year, month, day = date_string:match("(%d+)-(%d+)-(%d+)")
+	local year, month, day, hour = date_string:match("(%d+)-(%d+)-(%d+):(%d+)")
 
-	year = tonumber(year)
-	month = tonumber(month)
-	day = tonumber(day)
+	-- Get the time options we want if they exist in the string
+	year = tonumber(year or 1)
+	month = tonumber(month or 1)
+	day = tonumber(day or 1)
+	hour = tonumber(hour or 1)
 
 	local values = {
 		year = year,
 		month = month,
 		day = day,
+		hour = hour,
 	}
 
 	return values
@@ -99,8 +104,9 @@ end
 ---@param saved Date
 ---@return boolean verify The current date is larger than the previous date
 function M.date_change(current, saved)
-	local current_milliseconds = os.time({ year = current.year, month = current.month, day = current.day })
-	local saved_milliseconds = os.time({ year = saved.year, month = saved.month, day = saved.day })
+	local current_milliseconds =
+		os.time({ year = current.year, month = current.month, day = current.day, hour = current.hour })
+	local saved_milliseconds = os.time({ year = saved.year, month = saved.month, day = saved.day, hour = saved.hour })
 
 	return current_milliseconds >= saved_milliseconds
 end
@@ -135,14 +141,16 @@ end
 ---@return string date The date to save in "yyyy-mm-dd" format
 function M.next_time(current, opts)
 	-- Update the next time to change the color scheme
-	local milliseconds = os.time({ year = current.year, month = current.month, day = current.day })
+	local milliseconds = os.time({
+		year = current.year + opts.years,
+		month = current.month + opts.months,
+		day = current.day + opts.days,
+		hour = current.hour + opts.hours,
+	})
+
 	local date = os.date("*t", milliseconds)
 
-	date.day = date.day + opts.days
-	date.month = date.month + opts.months
-	date.year = date.year + opts.years
-
-	local timestamp = string.format("%d-%02d-%02d", date.year, date.month, date.day)
+	local timestamp = string.format("%d-%02d-%02d:%02d", date.year, date.month, date.day, date.hour)
 
 	return timestamp
 end
@@ -168,7 +176,7 @@ function M.randomize(colorscheme)
 	}
 
 	local newtheme = M.get_truly_random(themes, colorscheme)
-	local date = M.parse_date(tostring(os.date("%Y-%m-%d")))
+	local date = M.parse_date(tostring(os.date("%Y-%m-%d:%H")))
 	local newdate = M.next_time(date, opts)
 
 	M.save_file(newtheme, newdate)
@@ -185,12 +193,14 @@ function M.get_theme(opts)
 	M.opts = opts
 
 	local colorscheme
-	local date = M.parse_date(tostring(os.date("%Y-%m-%d")))
+	local date = M.parse_date(tostring(os.date("%Y-%m-%d:%H")))
 	local dateoptions = {
 		days = opts.days,
 		years = opts.years,
 		months = opts.months,
+		hours = opts.hours,
 	}
+
 	local newdate = M.next_time(date, dateoptions)
 
 	-- Check whether there is a timestamp file saved
