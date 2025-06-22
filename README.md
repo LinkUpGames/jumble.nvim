@@ -9,7 +9,7 @@ Say goodbye to tedious manual theme changes! With this plugin, your theme will a
 ![example](https://github.com/user-attachments/assets/418c4550-4caf-462a-b145-c50a251f5d02)
 
 ## 🚀 Features
-**Customizable Intervals**: Choose from daily, weekly, monthly, or even yearly intervals to randomize your theme
+**Customizable Intervals**: Choose from hourly, daily, weekly, monthly, or even yearly intervals to randomize your theme
 
 ## ⚡ Requirements
 - Neovim >= 0.10.0
@@ -39,7 +39,10 @@ require("jumble").setup()
 ---@field months number The number of months before the new theme rolls over
 ---@field years number The number of years before the new theme rolls over
 ---@field hours number The number of hours before the new theme rolls over
+---@field minutes number The number of minutes before the new theme rolls over
 ---@field themes table<string> The themes to include for randomizing (empty will default to all themes)
+---@field live_change boolean Whether the theme should change live after the given time period is fulfilled (will only work for hour and minute changes)
+
 return {
   "LinkUpGames/jumble.nvim",
   opts = {
@@ -47,6 +50,8 @@ return {
     months = 0,
     years = 0,
     hours = 0,
+    minutes = 0,
+    live_change = false,
     themes = {}
   }
 }
