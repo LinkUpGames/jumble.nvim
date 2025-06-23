@@ -121,8 +121,13 @@ function M.date_change(current, saved)
 		hour = current.hour,
 		min = current.minute,
 	})
-	local saved_milliseconds =
-		os.time({ year = saved.year, month = saved.month, day = saved.day, hour = saved.hour, min = saved.minute })
+	local saved_milliseconds = os.time({
+		year = saved.year,
+		month = saved.month,
+		day = saved.day,
+		hour = saved.hour,
+		min = saved.minute,
+	}) or 0
 
 	return current_milliseconds >= saved_milliseconds
 end
@@ -274,7 +279,7 @@ function M.update_colorscheme(opts)
 	-- Verify that only up to hours is set
 	local values = { opts.months, opts.years, opts.days }
 
-	for i, value in ipairs(values) do
+	for _, value in ipairs(values) do
 		if value > 0 then
 			status = false
 			break
