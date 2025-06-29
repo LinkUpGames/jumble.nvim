@@ -210,6 +210,7 @@ function M.randomize(colorscheme)
 	M.save_file(newtheme, newdate)
 
 	vim.cmd("colorscheme " .. newtheme)
+	vim.cmd("bufdo e")
 
 	M.notify_change(newtheme, newdate)
 end
@@ -295,6 +296,7 @@ function M.update_colorscheme()
 	local timeleft = M.time_to_next()
 	local limit = 24 * 60 * 60 * 1000
 
+	-- Only do it for within days
 	if timeleft > 0 and timeleft < limit then
 		vim.defer_fn(function()
 			M.randomize(vim.g.colors_name)
