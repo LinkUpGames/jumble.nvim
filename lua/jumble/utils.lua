@@ -14,6 +14,7 @@
 
 local M = {
 	opts = {},
+	next_date = "",
 }
 
 -- File for colorscheme
@@ -58,6 +59,8 @@ function M.save_file(colorscheme, date)
 		file:write(date, "\n")
 		file:close()
 
+		M.next_date = date
+
 		return true
 	end
 
@@ -84,7 +87,7 @@ function M.load_file()
 	return table
 end
 
----Parse the date as a string "yyyy-mm-dd", returns a table with the year, month and day
+---Parse the date as a string "yyyy-mm-dd:HH:MM", returns a table with the year, month and day
 ---@param date_string string
 ---@return {year: number, month: number, day:number, hour:number, minute:number} values Returns the year, month and day as a value
 function M.parse_date(date_string)
@@ -207,6 +210,7 @@ function M.randomize(colorscheme)
 	M.save_file(newtheme, newdate)
 
 	vim.cmd("colorscheme " .. newtheme)
+	vim.cmd("bufdo e")
 
 	M.notify_change(newtheme, newdate)
 end
@@ -230,6 +234,7 @@ function M.get_theme(opts)
 	}
 
 	local newdate = M.next_time(date, dateoptions)
+	M.next_date = newdate
 
 	-- Check whether there is a timestamp file saved
 	local data = M.load_file()
@@ -266,47 +271,38 @@ function M.get_theme(opts)
 
 	-- Ensure the callback
 	if opts.live_change then
-		M.update_colorscheme(opts)
+		M.update_colorscheme()
 	end
 end
 
+---The amount of time left before the next color switch is due based on the date passed
+---@return number milliseconds The time in milliseconds before the next update
+function M.time_to_next()
+	-- Setup the dates
+	local next = M.parse_date(M.next_date)
+
+	-- Epoch
+	local nowepoch = os.time()
+	local nextepoch =
+		os.time({ year = next.year, month = next.month, day = next.day, hour = next.hour, min = next.minute })
+
+	local milliseconds = math.abs(nextepoch - nowepoch) * 1000
+
+	return milliseconds
+end
+
 ---Update the colorscheme automatically by using a callback after the amount of time has passed
----@param opts opts
-function M.update_colorscheme(opts)
-	-- Status update
-	local status = true
+function M.update_colorscheme()
+	local timeleft = M.time_to_next()
+	local limit = 24 * 60 * 60 * 1000
 
-	-- Verify that only up to hours is set
-	local values = { opts.months, opts.years, opts.days }
+	-- Only do it for within days
+	if timeleft > 0 and timeleft < limit then
+		vim.defer_fn(function()
+			M.randomize(vim.g.colors_name)
 
-	for _, value in ipairs(values) do
-		if value > 0 then
-			status = false
-			break
-		end
-	end
-
-	-- Create the callback
-	if status then
-		-- Get the milliseconds for it to run next
-		local hours = opts.hours * 3600000
-		local minutes = opts.minutes * 60000
-
-		local milliseconds = hours + minutes
-
-		-- Create Callback
-		local timer = vim.uv.new_timer()
-
-		if timer ~= nil then
-			timer:start(
-				milliseconds,
-				milliseconds,
-				vim.schedule_wrap(function()
-					local colorscheme = vim.g.colors_name
-					M.randomize(colorscheme)
-				end)
-			)
-		end
+			M.update_colorscheme()
+		end, timeleft)
 	end
 end
 
