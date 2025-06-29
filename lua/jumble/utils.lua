@@ -278,23 +278,14 @@ end
 ---@return number milliseconds The time in milliseconds before the next update
 function M.time_to_next()
 	-- Setup the dates
-	local now = M.parse_date(tostring(os.date(date_format)))
-	local nowmilli = os.time({ year = now.year, month = now.month, day = now.day, min = now.minute, hour = now.hour })
+	local next = M.parse_date(M.next_date)
 
-	local nexttime = M.parse_date(M.next_date)
-	local nextmilli = os.time({
-		year = nexttime.year,
-		month = nexttime.month,
-		day = nexttime.day,
-		hour = nexttime.hour,
-		min = nexttime.minute,
-	})
+	-- Epoch
+	local nowepoch = os.time()
+	local nextepoch =
+		os.time({ year = next.year, month = next.month, day = next.day, hour = next.hour, min = next.minute })
 
-	local milliseconds = nextmilli - nowmilli
-
-	vim.notify(vim.inspect(tostring(nowmilli)))
-	vim.notify(vim.inspect(tostring(nextmilli)))
-	vim.notify(vim.inspect(tostring(milliseconds)))
+	local milliseconds = math.abs(nextepoch - nowepoch) * 1000
 
 	return milliseconds
 end
@@ -302,8 +293,9 @@ end
 ---Update the colorscheme automatically by using a callback after the amount of time has passed
 function M.update_colorscheme()
 	local timeleft = M.time_to_next()
+	local limit = 24 * 60 * 60 * 1000
 
-	if timeleft > 0 then
+	if timeleft > 0 and timeleft < limit then
 		vim.defer_fn(function()
 			M.randomize(vim.g.colors_name)
 
