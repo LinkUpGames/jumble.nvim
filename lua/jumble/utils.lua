@@ -270,6 +270,28 @@ function M.get_theme(opts)
 	end
 end
 
+function M.try_lock()
+	local temp = colordirectory .. "temp"
+	local file = io.open(temp, "r")
+
+	if file then
+		file:close()
+		return false
+	end
+
+	-- Open
+	file = io.open(temp, "w")
+	if not file then
+		return false
+	end
+
+	local pid = vim.fn.getpid()
+	file:write(pid)
+	file:close()
+
+	return true
+end
+
 ---Update the colorscheme automatically by using a callback after the amount of time has passed
 ---@param opts opts
 function M.update_colorscheme(opts)
