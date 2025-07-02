@@ -14,6 +14,8 @@
 
 local M = {
 	opts = {},
+	next_date = "",
+	deferred = nil,
 }
 
 -- File for colorscheme
@@ -42,6 +44,23 @@ function M.get_colorschemes()
 	return colors
 end
 
+---Sets the theme that is saved to the save file
+function M.auto_roll_no_lock()
+	local data = M.load_file()
+
+	if data.colorscheme ~= nil and data.date ~= nil then
+		local colorscheme = data.colorscheme
+		local newdate = data.date
+
+		M.notify_change(colorscheme, newdate)
+		M.next_date = newdate
+
+		vim.cmd("colorscheme " .. colorscheme)
+
+		M.update_colorscheme()
+	end
+end
+
 ---Save the colorscheme and date to a file
 ---@param colorscheme string
 ---@param date string
@@ -57,6 +76,9 @@ function M.save_file(colorscheme, date)
 		file:write(colorscheme, "\n")
 		file:write(date, "\n")
 		file:close()
+
+		-- Save the next date here
+		M.next_date = date
 
 		return true
 	end
@@ -186,8 +208,8 @@ function M.notify_change(colorscheme, date)
 	vim.notify(message, 0)
 end
 
----Randomize the colorscheme
----@param colorscheme string The current colorscheme
+---randomize the colorscheme
+---@param colorscheme string the current colorscheme
 function M.randomize(colorscheme)
 	local themes = M.opts.themes
 
@@ -206,9 +228,75 @@ function M.randomize(colorscheme)
 
 	M.save_file(newtheme, newdate)
 
+	-- Reset the auto switcher
+	if M.opts.live_change then
+		M.cancel_auto_update()
+	end
+
+	vim.cmd("colorscheme " .. newtheme)
+	M.notify_change(newtheme, newdate)
+end
+
+---The instance of neovim that managed to get the lockfile gets to modify the save file
+---@param colorscheme string The current colorscheme
+function M.auto_roll_locked(colorscheme)
+	local themes = M.opts.themes
+
+	---@type Options
+	local opts = {
+		days = M.opts.days,
+		years = M.opts.years,
+		months = M.opts.months,
+		hours = M.opts.hours,
+		minutes = M.opts.minutes,
+	}
+
+	-- Get the new theme and date
+	local newtheme = M.get_truly_random(themes, colorscheme)
+	local date = M.parse_date(tostring(os.date(date_format)))
+	local newdate = M.next_time(date, opts)
+
+	-- Save it
+	M.save_file(newtheme, newdate)
+	M.notify_change(newtheme, newdate)
+	M.next_date = newdate
+
 	vim.cmd("colorscheme " .. newtheme)
 
-	M.notify_change(newtheme, newdate)
+	-- Release the lock after a certain amount of time
+	vim.defer_fn(function()
+		M.release_lock()
+
+		M.update_colorscheme()
+	end, 2000)
+end
+
+---Run the auto roll of the theme when the timer runs out
+---@param colorscheme string the current colorscheme
+function M.auto_roll_theme(colorscheme)
+	-- The range before trying to get the lock [1,2] seconds (inclusive)
+	local range = { 0.3, 1 }
+	local pid = vim.fn.getpid() -- seed randomizer
+
+	-- Random Seed
+	math.randomseed(os.time() + pid)
+	local randomvalue = math.random()
+
+	local milliseconds = (range[1] + (range[2] - range[1]) * randomvalue) * 1000
+
+	--Scheduled callback
+	vim.defer_fn(function()
+		-- Update the value to the directory
+		if M.try_lock() then -- Save and update the color
+			M.auto_roll_locked(colorscheme)
+		else -- Wait a bit and then read the value from the directory
+			local wait = 200
+
+			vim.defer_fn(function()
+				M.auto_roll_no_lock()
+			end, wait)
+		end
+	end, milliseconds)
 end
 
 ---Get a random theme from the list of themes we want
@@ -230,6 +318,7 @@ function M.get_theme(opts)
 	}
 
 	local newdate = M.next_time(date, dateoptions)
+	M.next_date = newdate -- Update to the new date
 
 	-- Check whether there is a timestamp file saved
 	local data = M.load_file()
@@ -245,6 +334,7 @@ function M.get_theme(opts)
 			-- Update the new time
 			M.save_file(colorscheme, newdate)
 			M.notify_change(colorscheme, newdate)
+			M.release_lock()
 		else
 			colorscheme = savedcolorscheme
 		end
@@ -266,14 +356,31 @@ function M.get_theme(opts)
 
 	-- Ensure the callback
 	if opts.live_change then
-		M.update_colorscheme(opts)
+		M.update_colorscheme()
 	end
 end
 
+---Get the time left in milliseconds before the theme turns
+function M.time_left()
+	local next = M.parse_date(M.next_date)
+
+	-- Epoch
+	local nowepoch = os.time()
+	local nextepoch =
+		os.time({ year = next.year, month = next.month, day = next.day, hour = next.hour, min = next.minute })
+
+	local milliseconds = math.abs(nextepoch - nowepoch) * 1000
+
+	return milliseconds
+end
+
+---Try and gather the lock for updating the file
+---@return boolean success True if the lock was aquired
 function M.try_lock()
 	local temp = colordirectory .. "temp"
 	local file = io.open(temp, "r")
 
+	-- Check if it exists
 	if file then
 		file:close()
 		return false
@@ -292,43 +399,48 @@ function M.try_lock()
 	return true
 end
 
----Update the colorscheme automatically by using a callback after the amount of time has passed
----@param opts opts
-function M.update_colorscheme(opts)
-	-- Status update
-	local status = true
+---Release the lock if it has previously been locked
+function M.release_lock()
+	local temp = colordirectory .. "temp"
+	local file = io.open(temp, "r")
 
-	-- Verify that only up to hours is set
-	local values = { opts.months, opts.years, opts.days }
-
-	for _, value in ipairs(values) do
-		if value > 0 then
-			status = false
-			break
-		end
+	if file then
+		os.remove(temp)
 	end
+end
 
-	-- Create the callback
-	if status then
-		-- Get the milliseconds for it to run next
-		local hours = opts.hours * 3600000
-		local minutes = opts.minutes * 60000
+---Debug log message
+---@param message string
+function M.debug(message)
+	vim.notify(message)
+end
 
-		local milliseconds = hours + minutes
+---Update the colorscheme automatically by using a callback after the amount of time has passed
+function M.update_colorscheme()
+	local timeleft = M.time_left()
 
-		-- Create Callback
-		local timer = vim.uv.new_timer()
+	-- Limit of one day
+	local limit = 24 * 60 * 60 * 1000
 
-		if timer ~= nil then
-			timer:start(
-				milliseconds,
-				milliseconds,
-				vim.schedule_wrap(function()
-					local colorscheme = vim.g.colors_name
-					M.randomize(colorscheme)
-				end)
-			)
-		end
+	-- Only do it if it's a day
+	-- TODO: Should we check if the lock file has not been deleted?
+	if timeleft > 0 and timeleft < limit then
+		M.deferred = vim.defer_fn(function()
+			M.auto_roll_theme(vim.g.colors_name)
+		end, timeleft)
+	end
+end
+
+---Cancel the auto update of a colorscheme
+function M.cancel_auto_update()
+	if M.deferred ~= nil then
+		M.deferred:stop()
+		M.deferred:close()
+
+		-- Remove the os file
+		M.release_lock()
+
+		M.update_colorscheme()
 	end
 end
 
