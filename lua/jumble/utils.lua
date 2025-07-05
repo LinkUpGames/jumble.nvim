@@ -423,7 +423,6 @@ function M.update_colorscheme()
 	local limit = 24 * 60 * 60 * 1000
 
 	-- Only do it if it's a day
-	-- TODO: Should we check if the lock file has not been deleted?
 	if timeleft > 0 and timeleft < limit then
 		M.deferred = vim.defer_fn(function()
 			M.auto_roll_theme(vim.g.colors_name)
