@@ -337,6 +337,8 @@ function M.get_theme(opts)
 			M.release_lock()
 		else
 			colorscheme = savedcolorscheme
+
+			M.next_date = data.date -- Update time to one stored
 		end
 	else
 		colorscheme = M.random_theme(opts.themes)
