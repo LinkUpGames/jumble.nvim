@@ -1,0 +1,70 @@
+local theme = require("jumble.theme")
+local constants = require("jumble.constants")
+local file = require("jumble.file")
+
+local M = {}
+
+---Update the colorscheme when the colorscheme changes
+---@param err string|nil
+---@param filename string
+---@param events uv.fs_event_start.callback.events
+function M.on_theme_change(err, filename, events)
+	if err then
+		vim.notify("Error with recieved colorscheme change: " .. err)
+
+		return
+	end
+
+	local change = events.change
+	local deleted = events.rename
+
+	-- Check for deleted file
+	if deleted then
+		-- NOTE: This is where we should schedule a lock update and see who can get the lock
+	end
+
+	-- Changes inside of the file
+	if change then
+		local content = file.get_theme()
+
+		if content == nil then
+			vim.notify("Could not update file: ")
+
+			return
+		end
+
+		theme.change_theme(content.colorscheme)
+
+		file:close()
+	end
+end
+
+---Check for the current lock file and update it
+---@param err string|nil
+---@param filename string
+---@param events uv.fs_event_start.callback.events
+function M.on_lock_change(err, filename, events)
+	if err then
+		vim.notify("Error with checking for lockfile updates: " .. err)
+
+		return
+	end
+
+	local deleted = events.rename
+
+	if deleted then
+		-- NOTE: We must fight for the lock again so try to get the lock
+	end
+end
+
+---Watch the colorscheme file for any changes
+function M.watch_colorscheme()
+	local fsevent = vim.uv.new_fs_event()
+
+	if fsevent ~= nil then
+		fsevent:start(constants.colorscheme, {}, vim.schedule_wrap(M.on_theme_change))
+	end
+end
+
+---@return table M Functions for watching changes within file
+return M

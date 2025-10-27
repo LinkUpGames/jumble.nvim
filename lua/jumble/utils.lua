@@ -12,9 +12,12 @@
 ---@field hours number The number of hours
 ---@field minutes number The number of minutes
 
+local lock = require("jumble.lock")
+
 local M = {
 	opts = {},
 	next_date = "",
+	lock = false,
 	deferred = nil,
 }
 
@@ -443,6 +446,19 @@ function M.cancel_auto_update()
 
 		M.update_colorscheme()
 	end
+end
+
+---Initialize the plugin
+function M.init()
+	-- Try to get the lock and check based on that
+	lock.acquire_lock(function(acquired)
+		if acquired then
+			-- TODO: continue from here
+			-- If acquired, then make sure that we are the one responsible for rolling and changing the colorscheme.
+			-- If not, we don't have anything to do other than just watch for changes in the colorscheme file
+			-- Additionally, if this instance is closed, make sure that we then again, remove the lock file and also re run the acquire lock part
+		end
+	end)
 end
 
 --- @return table M
