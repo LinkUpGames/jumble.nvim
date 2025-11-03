@@ -6,5 +6,30 @@ function M.change_theme(colorscheme)
 	vim.cmd("colorscheme " .. colorscheme)
 end
 
+---Get a randome theme given a table of themes to go through
+---@param themes table<string>
+---@return string theme The theme to use
+function M.get_random_theme(themes)
+	local i = math.random(os.time()) % #themes
+
+	i = i == 0 and #themes or i
+
+	return themes[i]
+end
+
+---Get a colorscheme from the table that does not match the one provided
+---@param themes table<string>
+---@param currenttheme string
+---@return string new_theme The new theme
+function M.new_theme(themes, currenttheme)
+	local newtheme
+
+	repeat
+		newtheme = M.get_random_theme(themes)
+	until currenttheme ~= newtheme
+
+	return newtheme
+end
+
 ---@return table M Theme functions for color theme changes
 return M

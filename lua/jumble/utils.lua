@@ -13,6 +13,7 @@
 ---@field minutes number The number of minutes
 
 local lock = require("jumble.lock")
+local schedule = require("jumble.schedule")
 
 local M = {
 	opts = {},
@@ -303,7 +304,7 @@ function M.auto_roll_theme(colorscheme)
 end
 
 ---Get a random theme from the list of themes we want
----@param opts opts The options passed down by the user
+---@param opts Opts The options passed down by the user
 function M.get_theme(opts)
 	-- Keep record of colorschemes
 	M.opts = opts
@@ -449,14 +450,20 @@ function M.cancel_auto_update()
 end
 
 ---Initialize the plugin
-function M.init()
+---@param opts Opts
+function M.init(opts)
+	-- Options
+	local themes = opts.themes
+
 	-- Try to get the lock and check based on that
 	lock.acquire_lock(function(acquired)
 		if acquired then
+			schedule.schedule_colorscheme_change(themes)
 			-- TODO: continue from here
 			-- If acquired, then make sure that we are the one responsible for rolling and changing the colorscheme.
 			-- If not, we don't have anything to do other than just watch for changes in the colorscheme file
 			-- Additionally, if this instance is closed, make sure that we then again, remove the lock file and also re run the acquire lock part
+		else -- Watch for changes
 		end
 	end)
 end

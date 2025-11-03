@@ -1,6 +1,6 @@
 local utils = require("jumble.utils")
 
----@class opts
+---@class Opts
 ---@field days number | nil The number of days before the new theme rolls over
 ---@field months number The number of months before the new theme rolls over
 ---@field years number The number of years before the new theme rolls over
@@ -10,7 +10,7 @@ local utils = require("jumble.utils")
 ---@field live_change boolean Whether the theme should change live after the given time period is fulfilled
 
 -- Local Options for plugin
----@type opts
+---@type Opts
 local options = {
 	days = 1,
 	months = 0,
@@ -24,7 +24,7 @@ local options = {
 -- Module Definition
 local M = {}
 
----@param opts? opts options
+---@param opts? Opts options
 function M.setup(opts)
 	if opts then
 		options = vim.tbl_extend("force", options, opts)

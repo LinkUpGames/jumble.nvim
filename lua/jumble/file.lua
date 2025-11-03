@@ -3,7 +3,7 @@ local constants = require("jumble.constants")
 local M = {}
 
 ---Check the colorscheme file
----@return {colorscheme: string, colorscheme: string}|nil content The colorscheme and the date, nil if does not exist
+---@return {colorscheme: string, date: string}|nil content The colorscheme and the date, nil if does not exist
 function M.get_theme()
 	local content = nil
 
