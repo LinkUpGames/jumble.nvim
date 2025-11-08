@@ -59,5 +59,26 @@ function M.time_left(date)
 	return milliseconds
 end
 
+---Update the time by adding or subtracting from the options provided
+---@param date string The date object to modify
+---@param opts DateOpts? The date options
+---@return string timestamp The new timestamp given the options
+function M.update_time(date, opts)
+	local current = M.parse_date(date)
+
+	local milliseconds = os.time({
+		year = current.year + (opts.years or 0),
+		month = current.month + (opts.months or 0),
+		day = current.day + (opts.days or 0),
+		hour = current.hour + (opts.hours or 0),
+		min = current.minute + (opts.minutes or 0),
+	})
+
+	local s = os.date("*t", milliseconds)
+	local timestamp = string.format(constants.timestampformat, s.year, s.month, s.day, s.hour, s.min)
+
+	return timestamp
+end
+
 ---@return table M Date functions and methods
 return M

@@ -6,7 +6,8 @@ local M = {}
 
 ---The main instance is responsible for changing the colorscheme
 ---@param themes table<string> The themes circulating
-function M.schedule_colorscheme_change(themes)
+---@param options DateOpts The options to pass down for scheduling a colorscheme change
+function M.schedule_colorscheme_change(themes, options)
 	-- Get date and colorscheme from file
 	local currenttheme = ""
 	local nextdate = "" -- Set this to the next date of change
@@ -25,10 +26,17 @@ function M.schedule_colorscheme_change(themes)
 	-- Make sure that if this is the first time than the milliseconds is set to the next time based
 	-- on the options, if not then this is just from the file gotten
 
+	-- Get the next date and save it now that we have a reference
+	-- to the other one on file
+	nextdate = date.update_time(nextdate, options)
+	file.save_theme(newtheme, nextdate) -- This function does not exist, make sure to add it
+
 	-- Save new theme and optsion
 
 	-- Create the scheduler for the colorscheme change
-	vim.defer_fn(M.schedule_colorscheme_change(themes, nextdate), milliseconds)
+	vim.defer_fn(function()
+		M.schedule_colorscheme_change(themes, options)
+	end, milliseconds)
 end
 
 ---@return table M Scheduling methods for this

@@ -1,17 +1,3 @@
----@class Date
----@field year number The year
----@field month number The month
----@field day number The day
----@field hour number The hour
----@field minute number The minute
-
----@class Options
----@field years number The number of years after the initial date
----@field months number The number of months after the initial date
----@field days number The number of days
----@field hours number The number of hours
----@field minutes number The number of minutes
-
 local lock = require("jumble.lock")
 local schedule = require("jumble.schedule")
 
@@ -455,10 +441,19 @@ function M.init(opts)
 	-- Options
 	local themes = opts.themes
 
+	---@type DateOpts
+	local timeoptions = {
+		days = opts.days,
+		hours = opts.hours,
+		minutes = opts.minutes,
+		months = opts.minutes,
+		years = opts.years,
+	}
+
 	-- Try to get the lock and check based on that
 	lock.acquire_lock(function(acquired)
 		if acquired then
-			schedule.schedule_colorscheme_change(themes)
+			schedule.schedule_colorscheme_change(themes, timeoptions)
 			-- TODO: continue from here
 			-- If acquired, then make sure that we are the one responsible for rolling and changing the colorscheme.
 			-- If not, we don't have anything to do other than just watch for changes in the colorscheme file
