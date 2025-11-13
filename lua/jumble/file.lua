@@ -39,5 +39,13 @@ function M.get_lock()
 	return pid
 end
 
+---Save the file
+---@param theme string The new theme
+---@param date string The new data
+function M.save_theme(theme, date)
+	-- TODO: Continue from here, add this method then finish schedule colorscheme
+	local path = constants.colorscheme
+end
+
 ---@return table M All file related methods
 return M
