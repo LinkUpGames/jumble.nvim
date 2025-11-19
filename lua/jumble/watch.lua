@@ -28,7 +28,7 @@ function M.on_theme_change(err, filename, events)
 		local content = file.get_theme()
 
 		if content == nil then
-			vim.notify("Could not update file: ")
+			vim.notify("Could not read file content")
 
 			return
 		end

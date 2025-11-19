@@ -5,6 +5,8 @@ local M = {
 	lock = path .. "lock",
 	-- Colorscheme file
 	colorscheme = path .. "colorscheme",
+	-- Plugin Path
+	path = path,
 	-- Date Formats
 	dateformat = "%Y-%m-%d:%H:%M",
 	datematch = "(%d+)-(%d+)-(%d+):(%d+):(%d+)",

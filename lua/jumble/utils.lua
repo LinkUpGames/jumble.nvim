@@ -1,4 +1,5 @@
 local lock = require("jumble.lock")
+local watch = require("jumble.watch")
 local schedule = require("jumble.schedule")
 
 local M = {
@@ -446,7 +447,7 @@ function M.init(opts)
 		days = opts.days,
 		hours = opts.hours,
 		minutes = opts.minutes,
-		months = opts.minutes,
+		months = opts.months,
 		years = opts.years,
 	}
 
@@ -454,11 +455,9 @@ function M.init(opts)
 	lock.acquire_lock(function(acquired)
 		if acquired then
 			schedule.schedule_colorscheme_change(themes, timeoptions)
-			-- TODO: continue from here
-			-- If acquired, then make sure that we are the one responsible for rolling and changing the colorscheme.
-			-- If not, we don't have anything to do other than just watch for changes in the colorscheme file
 			-- Additionally, if this instance is closed, make sure that we then again, remove the lock file and also re run the acquire lock part
 		else -- Watch for changes
+			watch.watch_colorscheme()
 		end
 	end)
 end

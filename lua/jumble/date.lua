@@ -47,6 +47,10 @@ end
 ---@param date string The next date to check
 ---@return number milliseconds The milliseconds between now and then
 function M.time_left(date)
+	if not date or date == "" then
+		return 0
+	end
+
 	local next = M.parse_date(date)
 
 	-- Epoch
@@ -54,7 +58,8 @@ function M.time_left(date)
 	local nextepoch =
 		os.time({ year = next.year, month = next.month, day = next.day, hour = next.hour, min = next.minute })
 
-	local milliseconds = math.abs(nextepoch - nowepoch) * 1000
+	local diff = nextepoch - nowepoch
+	local milliseconds = diff > 0 and diff * 1000 or 0
 
 	return milliseconds
 end
@@ -64,9 +69,10 @@ end
 ---@param opts DateOpts? The date options
 ---@return string timestamp The new timestamp given the options
 function M.update_time(date, opts)
-	local current = M.parse_date(date)
+	opts = opts or {}
+	local current = M.parse_date(date or "")
 
-	local milliseconds = os.time({
+	local seconds = os.time({
 		year = current.year + (opts.years or 0),
 		month = current.month + (opts.months or 0),
 		day = current.day + (opts.days or 0),
@@ -74,7 +80,18 @@ function M.update_time(date, opts)
 		min = current.minute + (opts.minutes or 0),
 	})
 
-	local s = os.date("*t", milliseconds)
+	local s = os.date("*t", seconds)
+	local timestamp = string.format(constants.timestampformat, s.year, s.month, s.day, s.hour, s.min)
+
+	return timestamp
+end
+
+---Get the time now in a formatted date string
+---@return string date The current time as a date string formatted to the required parts
+function M.time_now()
+	local s = os.date("*t", os.time())
+
+	-- Parse the string
 	local timestamp = string.format(constants.timestampformat, s.year, s.month, s.day, s.hour, s.min)
 
 	return timestamp
