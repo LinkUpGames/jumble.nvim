@@ -29,9 +29,10 @@ function M.init(opts)
 		if acquired then
 			schedule.schedule_colorscheme_change(themes, timeoptions)
 			-- Additionally, if this instance is closed, make sure that we then again, remove the lock file and also re run the acquire lock part
-		else -- Watch for changes
-			watch.watch_colorscheme()
+			-- TODO: Add the autocmd to release (delete file) lock when the instance closes
 		end
+		-- Watch for changes
+		watch.watch_colorscheme()
 	end)
 end
 

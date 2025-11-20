@@ -8,17 +8,24 @@ local M = {}
 ---@param themes table<string> The themes circulating
 ---@param options DateOpts The options to pass down for scheduling a colorscheme change
 function M.schedule_colorscheme_change(themes, options)
-	-- Keep track of the current theme and the next date
-	local currenttheme = theme.new_theme(themes, "")
-	local nextdate = date.update_time(date.time_now()) -- Set this to the next date of change
-
 	-- Get date and colorscheme from file
 	local content = file.get_theme()
 
-	-- Make sure that the file exists
+	-- Keep track of the current theme and the next date
+	local currenttheme
+	local nextdate
+
 	if content then
+		-- File exists, use saved values
 		currenttheme = content.colorscheme
 		nextdate = content.date
+	else
+		-- First time running, get initial theme and set next date
+		currenttheme = theme.new_theme(themes, "")
+		nextdate = date.update_time(date.time_now())
+
+		-- Apply the initial theme immediately on first run
+		theme.change_theme(currenttheme)
 	end
 
 	-- Change Colorscheme and update the time left
