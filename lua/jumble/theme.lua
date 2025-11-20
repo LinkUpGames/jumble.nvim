@@ -31,5 +31,13 @@ function M.new_theme(themes, currenttheme)
 	return newtheme
 end
 
+---Get all themes from neovim
+--@return themes string[] The builtin and custom themes
+function M.get_all_themes()
+	local themes = vim.fn.getcompletion("", "color")
+
+	return themes
+end
+
 ---@return table M Theme functions for color theme changes
 return M
