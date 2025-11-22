@@ -34,8 +34,6 @@ function M.on_theme_change(err, filename, events)
 		end
 
 		theme.change_theme(content.colorscheme)
-
-		file:close()
 	end
 end
 
