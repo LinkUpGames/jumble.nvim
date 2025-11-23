@@ -38,6 +38,7 @@ function M.init(opts)
 		end
 
 		-- Watch for changes
+		watch.watch_lock()
 		watch.watch_colorscheme()
 	end)
 end

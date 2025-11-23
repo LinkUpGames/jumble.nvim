@@ -9,7 +9,7 @@ local M = {}
 ---@param err string|nil
 ---@param filename string
 ---@param events uv.fs_event_start.callback.events
-function M.on_theme_change(err, filename, events)
+function M.on_theme_change(err, _, events)
 	if err then
 		vim.notify("Error with recieved colorscheme change: " .. err)
 
@@ -68,6 +68,16 @@ function M.watch_colorscheme()
 		fsevent:start(constants.path, {
 			change = true,
 		}, vim.schedule_wrap(M.on_theme_change))
+	end
+end
+
+function M.watch_lock()
+	local fsevent = vim.uv.new_fs_event()
+
+	if fsevent ~= nil then
+		fsevent:start(constants.path, {
+			change = true,
+		}, vim.schedule_wrap(M.on_lock_change))
 	end
 end
 
