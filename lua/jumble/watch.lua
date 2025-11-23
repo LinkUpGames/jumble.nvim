@@ -60,12 +60,14 @@ function M.on_lock_change(err, filename, events)
 	end
 end
 
----Watch the colorscheme file for any changes
+--- Watch the colorscheme file for any changes
 function M.watch_colorscheme()
 	local fsevent = vim.uv.new_fs_event()
 
 	if fsevent ~= nil then
-		fsevent:start(constants.colorscheme, {}, vim.schedule_wrap(M.on_theme_change))
+		fsevent:start(constants.path, {
+			change = true,
+		}, vim.schedule_wrap(M.on_theme_change))
 	end
 end
 
