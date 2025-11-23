@@ -1,4 +1,5 @@
 local theme = require("jumble.theme")
+local date = require("jumble.date")
 local constants = require("jumble.constants")
 local file = require("jumble.file")
 
@@ -25,15 +26,19 @@ function M.on_theme_change(err, filename, events)
 
 	-- Changes inside of the file
 	if change then
-		local content = file.get_theme()
+		local milliseconds = date.get_random_milliseconds(0.3, 1)
 
-		if content == nil then
-			vim.notify("Could not read file content")
+		vim.defer_fn(function()
+			local content = file.get_theme()
 
-			return
-		end
+			if content == nil then
+				vim.notify("Could not read file content")
 
-		theme.change_theme(content.colorscheme)
+				return
+			end
+
+			theme.change_theme(content.colorscheme)
+		end, milliseconds)
 	end
 end
 
