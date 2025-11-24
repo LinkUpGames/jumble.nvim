@@ -6,7 +6,7 @@ local M = {}
 ---Try acquiring the lock and writing the pid to the file
 ---@return boolean success True if the lock was aquired by this neovim instance
 function M.try_lock()
-	local lock = constants.lock
+	local lock = constants.get_lock_path()
 	local file = io.open(lock, "r")
 
 	-- Check if the file exists
@@ -32,7 +32,7 @@ end
 ---Get the lock ID (PID) in the file
 ---@return integer pid The pid of the process that has the lock
 function M.lock_id()
-	local lock = constants.lock
+	local lock = constants.get_lock_path()
 
 	local file = io.open(lock, "r")
 
@@ -48,7 +48,7 @@ end
 ---Release the lock if this instance can do so
 ---@return boolean status Whether the file existed and the lock was removed
 function M.release_lock()
-	local lock = constants.lock
+	local lock = constants.get_lock_path()
 
 	local status = os.remove(lock)
 

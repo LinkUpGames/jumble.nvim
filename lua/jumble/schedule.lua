@@ -25,7 +25,7 @@ function M.schedule_colorscheme_change(themes, options)
 		nextdate = date.update_time(date.time_now())
 
 		-- Apply the initial theme immediately on first run
-		theme.change_theme(currenttheme)
+		file.save_theme(currenttheme, nextdate)
 	end
 
 	-- Change Colorscheme and update the time left

@@ -1,5 +1,4 @@
 local utils = require("jumble.utils")
-local theme = require("jumble.theme")
 
 ---@class DateOpts
 ---@field days number | nil The number of days before the new theme rolls over
@@ -28,17 +27,24 @@ local options = {
 	hours = 0,
 	minutes = 0,
 	live_change = false,
-	themes = theme.get_all_themes(), -- The themes to rotate for (empty means all)
+	themes = utils.get_all_themes(), -- The themes to rotate for (empty means all)
 }
 
 -- Module Definition
-local M = {}
+---@class JumbleModule The jumble module user options
+---@field opts Opts|nil
+local M = {
+	opts = nil,
+}
 
 ---@param opts? Opts options
 function M.setup(opts)
 	if opts then
 		options = vim.tbl_extend("force", options, opts)
 	end
+
+	-- Save current settings
+	M.opts = options
 
 	utils.init(options)
 end

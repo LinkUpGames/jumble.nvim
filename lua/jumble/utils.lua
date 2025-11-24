@@ -1,12 +1,11 @@
 local lock = require("jumble.lock")
 local watch = require("jumble.watch")
 local schedule = require("jumble.schedule")
+local file = require("jumble.file")
+local theme = require("jumble.theme")
 
 local M = {
 	opts = {},
-	next_date = "",
-	lock = false,
-	deferred = nil,
 }
 
 ---Initialize the plugin
@@ -41,6 +40,18 @@ function M.init(opts)
 		watch.watch_lock()
 		watch.watch_colorscheme()
 	end)
+
+	-- Update theme to that on file
+	local content = file.get_theme() or {}
+	if content.colorscheme then
+		theme.change_theme(content.colorscheme or "")
+	end
+end
+
+---Get all themes from neovim
+---@return string[] themes All themes available
+function M.get_all_themes()
+	return theme.get_all_themes()
 end
 
 --- @return table M

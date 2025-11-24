@@ -19,7 +19,7 @@ function M.get_theme()
 
 	local content = nil
 
-	local path = constants.colorscheme
+	local path = constants.get_colorscheme_path()
 	local file = io.open(path, "r")
 
 	if file then
@@ -43,7 +43,7 @@ function M.get_lock()
 
 	local pid = nil
 
-	local path = constants.lock
+	local path = constants.get_lock_path()
 	local file = io.open(path, "r")
 
 	if file then
@@ -61,7 +61,7 @@ function M.save_theme(theme, date)
 
 	local status = false
 
-	local path = constants.colorscheme
+	local path = constants.get_colorscheme_path()
 	local file = io.open(path, "w")
 
 	if file then
