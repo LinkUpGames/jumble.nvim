@@ -60,10 +60,8 @@ function M.on_lock_change(err, filename, events)
 		local deleted = events.rename
 
 		if deleted then
-			lock.acquire_lock(function(acquired)
-				if acquired then
-					-- DRY
-				end
+			lock.handle_lock_acquisition(function()
+				-- DRY
 			end)
 		end
 	end

@@ -67,5 +67,21 @@ function M.acquire_lock(try)
 	end, milliseconds)
 end
 
+---Handle lock acquisition with common setup logic
+---@param on_acquired function() Function to call when lock is acquired
+function M.handle_lock_acquisition(on_acquired)
+	M.acquire_lock(function(acquired)
+		if acquired then
+			on_acquired()
+			-- Set up autocmd to release lock when instance closes
+			vim.api.nvim_create_autocmd({ "QuitPre" }, {
+				callback = function()
+					M.release_lock()
+				end,
+			})
+		end
+	end)
+end
+
 ---@return table M Lock functions for getting the "mutex" lock we want
 return M
