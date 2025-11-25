@@ -55,7 +55,7 @@ function M.on_lock_change(err, filename, events, options)
 	local themes, dateoptions = options.themes, options.timeoptions
 
 	if err or not filename or filename == "" then
-		vim.notify("Error with checking for lockfile updates: " .. err)
+		vim.notify("Error checking lockfile for updates: " .. err)
 
 		return
 	end
