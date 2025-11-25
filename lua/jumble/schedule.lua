@@ -38,6 +38,12 @@ function M.schedule_colorscheme_change(themes, options)
 
 	-- Create the scheduler for the colorscheme change
 	vim.defer_fn(function()
+		-- TODO: Fix this, this should only run once, it runs all the time currently
+		vim.notify_once(
+			string.format("Theme updated to %s. Next Update will happen %s.", newtheme, nextdate),
+			vim.log.levels.INFO
+		)
+
 		file.save_theme(newtheme, nextdate)
 
 		M.schedule_colorscheme_change(themes, options)
