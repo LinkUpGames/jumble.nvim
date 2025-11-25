@@ -24,7 +24,7 @@ function M.on_theme_change(err, filename, events)
 
 		-- Check for deleted file
 		if deleted then
-			-- If the file is deleted than the person with the sceduler should trigger a manual change
+			-- TODO: If the file is deleted than the person with the sceduler should trigger a manual change
 		end
 
 		-- Changes inside of the file
