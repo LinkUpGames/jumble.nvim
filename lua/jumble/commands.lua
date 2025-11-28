@@ -8,7 +8,6 @@ function M.commands()
 		if cmd.fargs[1] == "randomize" then
 			local colorscheme = vim.g.colors_name
 
-			-- TODO: Update this so that it uses new api format
 			utils.randomize(colorscheme)
 		end
 	end, {

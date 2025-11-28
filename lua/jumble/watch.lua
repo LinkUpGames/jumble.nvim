@@ -22,9 +22,12 @@ function M.on_theme_change(err, filename, events)
 		local change = events.change
 		local deleted = events.rename
 
-		-- Check for deleted file
+		-- Check for deleted file: Restart
 		if deleted then
-			-- TODO: If the file is deleted than the person with the sceduler should trigger a manual change
+			local currenttheme = theme.new_theme(theme.themes, "")
+			local nextdate = date.update_time(date.time_now())
+
+			file.save_theme(currenttheme, nextdate)
 		end
 
 		-- Changes inside of the file
