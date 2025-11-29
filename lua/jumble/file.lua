@@ -76,5 +76,14 @@ function M.save_theme(theme, date)
 	return status
 end
 
+---Check if the file exists
+---@param path string The file path
+---@return uv.fs_stat.result | nil exists True if the file exists
+function M.file_exists(path)
+	local exists = vim.uv.fs_stat(path)
+
+	return exists
+end
+
 ---@return table M All file related methods
 return M

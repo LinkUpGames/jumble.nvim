@@ -53,8 +53,7 @@ end
 ---Check for the current lock file and update it
 ---@param err string|nil
 ---@param filename string
----@param events uv.fs_event_start.callback.events
-function M.on_lock_change(err, filename, events)
+function M.on_lock_change(err, filename)
 	local themes, dateoptions = state.themes, state.timeoptions
 
 	if err or not filename or filename == "" then
@@ -64,9 +63,11 @@ function M.on_lock_change(err, filename, events)
 	end
 
 	if filename == constants.lock then
-		local deleted = events.rename
+		local exists = file.file_exists(constants.get_lock_path())
 
-		if deleted then
+		vim.notify("Lock File Exists: " .. vim.inspect(exists ~= nil))
+
+		if not exists then
 			-- Acquire lock and be the new instance responsible
 			lock.handle_lock_acquisition(function()
 				schedule.schedule_colorscheme_change(themes, dateoptions)
