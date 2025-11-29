@@ -54,9 +54,8 @@ end
 ---@param err string|nil
 ---@param filename string
 ---@param events uv.fs_event_start.callback.events
----@param options {themes: string[], timeoptions: DateOpts}
-function M.on_lock_change(err, filename, events, options)
-	local themes, dateoptions = options.themes, options.timeoptions
+function M.on_lock_change(err, filename, events)
+	local themes, dateoptions = state.themes, state.timeoptions
 
 	if err or not filename or filename == "" then
 		vim.notify("Error checking lockfile for updates: " .. err)
@@ -89,24 +88,13 @@ end
 
 --- Watch the lock file for any changes
 --- Pass along the themes and time options for acquiring the lock again
---- @param themes string[] The themes
---- @param timeoptions DateOpts Date options to pass along
-function M.watch_lock(themes, timeoptions)
+function M.watch_lock()
 	local fsevent = vim.uv.new_fs_event()
 
 	if fsevent ~= nil then
-		fsevent:start(
-			constants.path,
-			{
-				change = true,
-			},
-			vim.schedule_wrap(function(err, filename, events)
-				M.on_lock_change(err, filename, events, {
-					themes = themes,
-					timeoptions = timeoptions,
-				})
-			end)
-		)
+		fsevent:start(constants.path, {
+			change = true,
+		}, vim.schedule_wrap(M.on_lock_change))
 	end
 end
 

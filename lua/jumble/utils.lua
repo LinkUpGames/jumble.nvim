@@ -36,7 +36,7 @@ function M.init(opts)
 
 	-- Watch for changes
 	watch.watch_colorscheme()
-	watch.watch_lock(themes, timeoptions)
+	watch.watch_lock()
 
 	-- Update theme to that on file
 	local content = file.get_theme() or {}
