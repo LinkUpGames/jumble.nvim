@@ -4,6 +4,7 @@ local date = require("jumble.date")
 local constants = require("jumble.constants")
 local file = require("jumble.file")
 local lock = require("jumble.lock")
+local state = require("jumble.state")
 
 local M = {}
 
@@ -24,7 +25,7 @@ function M.on_theme_change(err, filename, events)
 
 		-- Check for deleted file: Restart
 		if deleted then
-			local currenttheme = theme.new_theme(theme.themes, "")
+			local currenttheme = theme.new_theme(state.themes, "")
 			local nextdate = date.update_time(date.time_now())
 
 			file.save_theme(currenttheme, nextdate)
