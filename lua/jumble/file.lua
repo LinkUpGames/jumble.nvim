@@ -85,5 +85,14 @@ function M.file_exists(path)
 	return exists
 end
 
+---Delete a file given a path
+---@param path string The path to the file to delete
+---@return boolean status Whether the file was deleted successfully or not
+function M.file_delete(path)
+	local status = os.remove(path)
+
+	return status
+end
+
 ---@return table M All file related methods
 return M
