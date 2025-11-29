@@ -21,15 +21,6 @@ function M.on_theme_change(err, filename, events)
 
 	if filename == constants.colorscheme then
 		local change = events.change
-		local deleted = events.rename
-
-		-- Check for deleted file: Restart
-		if deleted then
-			local currenttheme = theme.new_theme(state.themes, "")
-			local nextdate = date.update_time(date.time_now())
-
-			file.save_theme(currenttheme, nextdate)
-		end
 
 		-- Changes inside of the file
 		if change then
@@ -74,6 +65,29 @@ function M.on_lock_change(err, filename)
 	end
 end
 
+---Check for the colorscheme file being deleted
+---@param err string|nil
+---@param filename string
+function M.on_theme_deleted(err, filename)
+	if err or not filename or filename == "" then
+		vim.notify("Error on on_theme_deleted: " .. err)
+	end
+
+	if filename == constants.colorscheme then
+		local exists = file.file_exists(constants.colorscheme)
+
+		-- Only update if the file is deleted
+		if exists == nil then
+			local currenttheme = theme.new_theme(state.themes, "")
+			local nextdate = date.update_time(date.time_now())
+
+			file.save_theme(currenttheme, nextdate)
+
+			-- TODO: reschedule the colorscheme scheduler
+		end
+	end
+end
+
 --- Watch the colorscheme file for any changes
 function M.watch_colorscheme()
 	local fsevent = vim.uv.new_fs_event()
@@ -94,6 +108,17 @@ function M.watch_lock()
 		fsevent:start(constants.path, {
 			change = true,
 		}, vim.schedule_wrap(M.on_lock_change))
+	end
+end
+
+---Watch for any changes when the colorscheme file is deleted
+function M.watch_colorscheme_delete()
+	local fsevent = vim.uv.new_fs_event()
+
+	if fsevent ~= nil then
+		fsevent:start(constants.path, {
+			change = false,
+		}, vim.schedule_wrap(M.on_theme_deleted))
 	end
 end
 

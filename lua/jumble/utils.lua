@@ -5,6 +5,7 @@ local file = require("jumble.file")
 local theme = require("jumble.theme")
 local date = require("jumble.date")
 local state = require("jumble.state")
+local constants = require("jumble.constants")
 
 local M = {
 	opts = {},
@@ -32,6 +33,7 @@ function M.init(opts)
 	-- Try to get the lock and check based on that
 	lock.handle_lock_acquisition(function()
 		schedule.schedule_colorscheme_change(themes, timeoptions)
+		watch.watch_colorscheme_delete()
 	end)
 
 	-- Watch for changes
@@ -54,15 +56,9 @@ end
 ---Randomize and select a new random colorscheme
 ---@param colorscheme string The current theme so that we can avoid it
 function M.randomize(colorscheme)
-	local newtheme = theme.new_theme(state.themes, colorscheme)
-	local nextdate = date.update_time(date.time_now(), state.timeoptions)
-
-	file.save_theme(newtheme, nextdate)
-
-	vim.notify_once(
-		string.format("Theme updated to %s.\nNext Update will happen %s.", newtheme, nextdate),
-		vim.log.levels.INFO
-	)
+	-- Delete the file so that we retrigger a new theme and also the rescheduler to recompute a new time
+	-- before the theme changes again
+	file.file_delete(constants.get_colorscheme_path())
 end
 
 --- @return table M
