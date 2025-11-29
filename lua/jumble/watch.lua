@@ -65,8 +65,6 @@ function M.on_lock_change(err, filename)
 	if filename == constants.lock then
 		local exists = file.file_exists(constants.get_lock_path())
 
-		vim.notify("Lock File Exists: " .. vim.inspect(exists ~= nil))
-
 		if not exists then
 			-- Acquire lock and be the new instance responsible
 			lock.handle_lock_acquisition(function()

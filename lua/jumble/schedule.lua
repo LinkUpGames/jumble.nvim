@@ -13,31 +13,31 @@ function M.schedule_colorscheme_change(themes, options)
 
 	-- Keep track of the current theme and the next date
 	local currenttheme
-	local nextdate
+	local currentnextdate
 
 	if content then
 		-- File exists, use saved values
 		currenttheme = content.colorscheme
-		nextdate = content.date
+		currentnextdate = content.date
 	else
 		-- First time running, get initial theme and set next date
 		currenttheme = theme.new_theme(themes, "")
-		nextdate = date.update_time(date.time_now())
+		currentnextdate = date.update_time(date.time_now())
 
 		-- Apply the initial theme immediately on first run
-		file.save_theme(currenttheme, nextdate)
+		file.save_theme(currenttheme, currentnextdate)
 	end
 
 	-- Change Colorscheme and update the time left
 	local newtheme = theme.new_theme(themes, currenttheme)
-	local milliseconds = date.time_left(nextdate)
-
-	-- Get the next date and save it now that we have a reference
-	-- to the other one on file
-	nextdate = date.update_time(date.time_now(), options)
+	local milliseconds = date.time_left(currentnextdate)
 
 	-- Create the scheduler for the colorscheme change
 	vim.defer_fn(function()
+		-- Get the next date and save it now that we have a reference
+		-- to the other one on file
+		local nextdate = date.update_time(date.time_now(), options)
+
 		vim.notify_once(
 			string.format("Theme updated to %s.\nNext Update will happen %s.", newtheme, nextdate),
 			vim.log.levels.INFO
