@@ -3,7 +3,6 @@ local watch = require("jumble.watch")
 local schedule = require("jumble.schedule")
 local file = require("jumble.file")
 local theme = require("jumble.theme")
-local date = require("jumble.date")
 local state = require("jumble.state")
 local constants = require("jumble.constants")
 
@@ -54,8 +53,7 @@ function M.get_all_themes()
 end
 
 ---Randomize and select a new random colorscheme
----@param colorscheme string The current theme so that we can avoid it
-function M.randomize(colorscheme)
+function M.randomize()
 	-- Delete the file so that we retrigger a new theme and also the rescheduler to recompute a new time
 	-- before the theme changes again
 	file.file_delete(constants.get_colorscheme_path())

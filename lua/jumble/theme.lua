@@ -39,5 +39,11 @@ function M.get_all_themes()
 	return themes
 end
 
+---Get the name of the current theme in the editor
+---@return string theme The name of the theme
+function M.get_current_theme()
+	return vim.g.colors_name
+end
+
 ---@return table M Theme functions for color theme changes
 return M

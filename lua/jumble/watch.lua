@@ -74,14 +74,16 @@ function M.on_theme_deleted(err, filename)
 	end
 
 	if filename == constants.colorscheme then
-		local exists = file.file_exists(constants.colorscheme)
+		local exists = file.file_exists(constants.get_colorscheme_path())
 
 		-- Only update if the file is deleted
 		if exists == nil then
-			local currenttheme = theme.new_theme(state.themes, "")
+			local currenttheme = theme.get_current_theme()
+			local newtheme = theme.new_theme(state.themes, currenttheme)
 			local nextdate = date.update_time(date.time_now())
 
-			file.save_theme(currenttheme, nextdate)
+			-- Save the new theme to the saved file for all instances to watch and update
+			file.save_theme(newtheme, nextdate)
 
 			-- TODO: reschedule the colorscheme scheduler
 		end
