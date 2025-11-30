@@ -2,12 +2,22 @@ local file = require("jumble.file")
 local theme = require("jumble.theme")
 local date = require("jumble.date")
 
-local M = {}
+local M = {
+	-- Reference to the current timer
+	theme_change_timer = nil, ---@type table
+}
 
 ---The main instance is responsible for changing the colorscheme
 ---@param themes table<string> The themes circulating
 ---@param options DateOpts The options to pass down for scheduling a colorscheme change
 function M.schedule_colorscheme_change(themes, options)
+	-- Make sure that if this is called again from an outside function, we remove the previous instance of the timer object
+	if M.theme_change_timer ~= nil then
+		M.theme_change_timer:stop()
+		M.theme_change_timer:close()
+		M.theme_change_timer = nil
+	end
+
 	-- Get date and colorscheme from file
 	local content = file.get_theme()
 
@@ -22,7 +32,7 @@ function M.schedule_colorscheme_change(themes, options)
 	else
 		-- First time running, get initial theme and set next date
 		currenttheme = theme.new_theme(themes, "")
-		currentnextdate = date.update_time(date.time_now())
+		currentnextdate = date.update_time(date.time_now(), options)
 
 		-- Apply the initial theme immediately on first run
 		file.save_theme(currenttheme, currentnextdate)
@@ -33,7 +43,10 @@ function M.schedule_colorscheme_change(themes, options)
 	local milliseconds = date.time_left(currentnextdate)
 
 	-- Create the scheduler for the colorscheme change
-	vim.defer_fn(function()
+	M.theme_change_timer = vim.defer_fn(function()
+		-- Remove Timer reference once it fires
+		M.theme_change_timer = nil
+
 		-- Get the next date and save it now that we have a reference
 		-- to the other one on file
 		local nextdate = date.update_time(date.time_now(), options)
