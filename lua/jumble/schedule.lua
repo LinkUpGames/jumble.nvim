@@ -1,6 +1,7 @@
 local file = require("jumble.file")
 local theme = require("jumble.theme")
 local date = require("jumble.date")
+local notify = require("jumble.notify")
 
 local M = {
 	-- Reference to the current timer
@@ -32,7 +33,7 @@ function M.schedule_colorscheme_change(themes, options)
 	else
 		-- First time running, get initial theme and set next date
 		currenttheme = theme.new_theme(themes, "")
-		currentnextdate = date.update_time(date.time_now(), options)
+		currentnextdate = date.update_time(date.time_now())
 
 		-- Apply the initial theme immediately on first run
 		file.save_theme(currenttheme, currentnextdate)
@@ -51,11 +52,8 @@ function M.schedule_colorscheme_change(themes, options)
 		-- to the other one on file
 		local nextdate = date.update_time(date.time_now(), options)
 
-		vim.notify_once(
-			string.format("Theme updated to %s.\nNext Update will happen %s.", newtheme, nextdate),
-			vim.log.levels.INFO
-		)
-
+		-- Update the time
+		notify.notify_theme_change(newtheme, nextdate)
 		file.save_theme(newtheme, nextdate)
 
 		M.schedule_colorscheme_change(themes, options)

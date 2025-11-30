@@ -5,6 +5,7 @@ local constants = require("jumble.constants")
 local file = require("jumble.file")
 local lock = require("jumble.lock")
 local state = require("jumble.state")
+local notify = require("jumble.notify")
 
 local M = {}
 
@@ -20,7 +21,7 @@ function M.on_theme_change(err, filename, events)
 	end
 
 	if filename == constants.colorscheme then
-		local change = events.change
+		local change = events.change or events.rename
 
 		-- Changes inside of the file
 		if change then
@@ -85,6 +86,7 @@ function M.on_theme_deleted(err, filename)
 
 			-- Save the new theme to the saved file for all instances to watch and update
 			file.save_theme(newtheme, nextdate)
+			notify.notify_theme_change(newtheme, nextdate)
 
 			-- Schedule again
 			schedule.schedule_colorscheme_change(colorscheme, dateoptions)
