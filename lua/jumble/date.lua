@@ -97,5 +97,37 @@ function M.time_now()
 	return timestamp
 end
 
+---Convert milliseconds to a duration object with years, months, days, hours, minutes, seconds
+---@param milliseconds number The millisecond timestamp to convert
+---@return {years: number, months: number, days: number, hours: number, minutes: number, seconds: number, milliseconds: number} duration The duration breakdown
+function M.duration(milliseconds)
+	local total_seconds = math.floor(milliseconds / 1000)
+	local remaining_ms = milliseconds % 1000
+
+	-- Calculate time components
+	local minutes = math.floor(total_seconds / 60)
+	local seconds = total_seconds % 60
+	local hours = math.floor(minutes / 60)
+	minutes = minutes % 60
+	local days = math.floor(hours / 24)
+	hours = hours % 24
+
+	-- Approximate years and months (using average values)
+	local years = math.floor(days / 365.25)
+	days = days % 365.25
+	local months = math.floor(days / 30.44) -- Average month length
+	days = days % 30.44
+
+	return {
+		years = years,
+		months = months,
+		days = math.floor(days),
+		hours = hours,
+		minutes = minutes,
+		seconds = seconds,
+		milliseconds = remaining_ms,
+	}
+end
+
 ---@return table M Date functions and methods
 return M
