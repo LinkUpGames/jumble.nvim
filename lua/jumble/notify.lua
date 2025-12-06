@@ -43,7 +43,7 @@ function M.notify_theme_change(theme, timestamp)
 	local message = time_left(timestamp)
 	local value = string.format("Theme updated to %s. \nNext update will happen %s", theme, message)
 
-	vim.notify_once(value, vim.log.levels.INFO)
+	vim.notify(value, vim.log.levels.INFO)
 end
 
 ---@return table notify The notification api
