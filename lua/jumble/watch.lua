@@ -61,6 +61,8 @@ function M.on_lock_change(err, filename)
 			-- Acquire lock and be the new instance responsible
 			lock.handle_lock_acquisition(function()
 				schedule.schedule_colorscheme_change(themes, dateoptions)
+
+				M.watch_colorscheme_delete()
 			end)
 		end
 	end
