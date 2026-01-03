@@ -6,9 +6,7 @@ local M = {}
 function M.commands()
 	vim.api.nvim_create_user_command("Jumble", function(cmd)
 		if cmd.fargs[1] == "randomize" then
-			local colorscheme = vim.g.colors_name
-
-			utils.randomize(colorscheme)
+			utils.randomize()
 		end
 	end, {
 		nargs = 1,
