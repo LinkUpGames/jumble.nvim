@@ -19,7 +19,7 @@ Install the plugin using your preferred package manager
 ```lua
 -- lazy.nvim
 return {
-  "LinkUpGames/jumble.nvim",
+  "nutt-y/jumble.nvim",
   opts = { }
 }
 ```
@@ -62,7 +62,7 @@ return {
 ```lua
 -- Example setup
 return {
-  "LinkUpGames/jumble.nvim",
+  "nutt-y/jumble.nvim",
   opts = {
     days = 2, -- switches to a random theme every 2 days
     themes = { -- Will randomly pick from these three themes
