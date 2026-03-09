@@ -2,8 +2,12 @@ local M = {}
 
 ---The colorscheme to change this neovim instance to
 ---@param colorscheme string
-function M.change_theme(colorscheme)
+---@param callback function
+function M.change_theme(colorscheme, callback)
 	vim.cmd("colorscheme " .. colorscheme)
+
+	-- Callback update
+	callback()
 end
 
 ---Get a randome theme given a table of themes to go through
