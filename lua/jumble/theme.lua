@@ -1,13 +1,16 @@
+local state = require("jumble.state")
+
 local M = {}
 
 ---The colorscheme to change this neovim instance to
 ---@param colorscheme string
----@param callback function
-function M.change_theme(colorscheme, callback)
+function M.change_theme(colorscheme)
 	vim.cmd("colorscheme " .. colorscheme)
 
-	-- Callback update
-	callback()
+	-- Call the callback
+	if state.callback ~= nil then
+		state.callback()
+	end
 end
 
 ---Get a randome theme given a table of themes to go through

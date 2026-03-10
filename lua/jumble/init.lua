@@ -10,6 +10,7 @@ local utils = require("jumble.utils")
 ---@class Opts: DateOpts
 ---@field themes table<string> The themes to include for randomizing (empty will default to all colorschemes)
 ---@field live_change boolean Whether the theme should change live after the given time period is fulfilled
+---@field callback function Callback function that get's called when the colortheme changes
 
 ---@class Date
 ---@field day number
@@ -28,6 +29,7 @@ local options = {
 	minutes = 0,
 	live_change = false,
 	themes = utils.get_all_themes(), -- The themes to rotate for (empty means all)
+	callback = function() end,
 }
 
 -- Module Definition

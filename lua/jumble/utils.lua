@@ -25,10 +25,8 @@ function M.init(opts)
 		years = opts.years,
 	}
 
-	-- Callback when the theme changes
-	local on_change_callback = opts.on_change
-
 	-- Save options
+	state.save_callback(opts.callback)
 	state.save_theme_state(themes)
 	state.save_timeoptions_state(timeoptions)
 
@@ -45,7 +43,7 @@ function M.init(opts)
 	-- Update theme to that on file
 	local content = file.get_theme() or {}
 	if content.colorscheme then
-		theme.change_theme(content.colorscheme or "", on_change_callback)
+		theme.change_theme(content.colorscheme or "")
 	end
 end
 

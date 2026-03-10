@@ -9,6 +9,9 @@ local M = {
 		minutes = 0,
 		hours = 0,
 	},
+
+	---@type function The callback function
+	callback = function() end,
 }
 
 ---The themes to save
@@ -21,6 +24,12 @@ end
 ---@param timeoptions DateOpts The options to save
 function M.save_timeoptions_state(timeoptions)
 	M.timeoptions = timeoptions
+end
+
+---Save the callback theme to call when the theme changes
+---@param callback function The callback function
+function M.save_callback(callback)
+	M.callback = callback
 end
 
 ---@return table M Save options to a seperate table
