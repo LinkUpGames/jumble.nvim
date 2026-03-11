@@ -26,6 +26,7 @@ function M.init(opts)
 	}
 
 	-- Save options
+	state.save_callback(opts.callback)
 	state.save_theme_state(themes)
 	state.save_timeoptions_state(timeoptions)
 
